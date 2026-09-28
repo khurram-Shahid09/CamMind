@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+.next/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Media and models
+media/
+buffer/
+*.onnx
+infra/test-streams/*.mp4
+evals/clips/**/*.mp4
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,70 @@
+[project]
+name = "cammind-core"
+version = "0.1.0"
+description = "CamMind API (Django + DRF) and Celery workers (compile, verify, media, actions)"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "django",
+    "djangorestframework",
+    "drf-spectacular",
+    "django-environ",
+    "django-cors-headers",
+    "djangorestframework-simplejwt",
+    "uvicorn[standard]",
+    "celery[redis]",
+    "redis",
+    "psycopg[binary]",
+    "argon2-cffi",
+    "python-ulid",
+    "pydantic",
+    "httpx",
+    "cryptography",
+    "sentry-sdk",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-django",
+    "ruff",
+    "mypy",
+    "django-stubs[compatible-mypy]",
+    "djangorestframework-stubs",
+]
+
+[tool.uv]
+package = false
+# Versions policy (docs/04-tech-stack.md): never adopt a release younger than 2 weeks.
+# Bump this date deliberately when upgrading dependencies.
+exclude-newer = "2026-09-20T00:00:00Z"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "DJ", "S", "SIM"]
+ignore = ["S101", "E501"]  # line length is handled by ruff format
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S105", "S106"]
+"conftest.py" = ["S105"]
+"**/migrations/**" = ["E501", "I001"]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+strict = false
+check_untyped_defs = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+exclude = ["migrations/"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings.test"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py"]
+addopts = "-q --strict-markers"
+markers = ["go2rtc: talks to the local go2rtc (docker compose); skipped when it isn't running"]

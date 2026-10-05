@@ -11,7 +11,7 @@ CamMind turns any RTSP IP camera into an AI watcher. You write a rule the way yo
 
 CamMind compiles the rule into a precise, checkable spec, shows you what it understood, and once you confirm, it watches the stream. When the rule is met it sends an alert with a snapshot and a short clip, by email, Telegram, Slack or webhook, and logs the event for review.
 
-> **Status:** 📝 Design complete, build starting. See the [roadmap](docs/15-roadmap-build-plan.md).
+> **Status:** 🏗️ Building the MVP: repo, infrastructure and test cameras are in place. See the [roadmap](docs/15-roadmap-build-plan.md).
 
 ---
 
@@ -124,15 +124,57 @@ Same core as WatchOnce and [InvoiceFlow](https://github.com/khurram-Shahid09/Inv
 | 19 | [Open questions](docs/19-open-questions.md) | Decisions and inputs needed |
 | ADR | [Decision records](docs/adr/) | Why the key choices were made |
 
-## Repository layout (planned)
+## Repository layout
 
 ```
-cammind/
-├── apps/web/            Next.js dashboard
-├── services/core/       Django API, Celery tasks (compile, verify, actions)
-├── services/vision/     Vision worker: RTSP → detections → rule engine → events
-├── infra/               docker-compose, go2rtc config, test RTSP streams
-├── evals/               Compiler prompts, labelled clips, eval runners, reports
-├── demo/                Demo scenes and video pipeline
-└── docs/                These docs
+CamMind/
+├── apps/web/                 Next.js dashboard
+├── services/core/            Django API, Celery tasks (compile, verify, media, actions)
+├── services/vision/          Vision worker: RTSP → detections → rule engine → events
+├── packages/cammind-spec/    Rule spec models shared by core and vision
+├── infra/                    docker-compose, go2rtc config, test RTSP streams
+├── evals/                    Compiler prompts, labelled clips, eval runners, reports (coming)
+└── docs/                     These docs
 ```
+
+## Run it locally
+
+Needs Docker Desktop, [uv](https://docs.astral.sh/uv/), Node 22 and pnpm.
+
+```bash
+cp .env.example .env    # then fill in DJANGO_SECRET_KEY
+
+# Infrastructure + five fake cameras (no hardware needed)
+docker compose -f infra/docker-compose.yml --profile test-streams up -d
+```
+
+| What | Where |
+|---|---|
+| go2rtc (live streams) | http://localhost:1984 |
+| Test cameras over RTSP | `rtsp://localhost:8654/<name>` (`home_backdoor`, `school_gate`, `school_parking`, `workshop_press`, `office_reception`) |
+| Mailpit (alert emails) | http://localhost:8027 |
+
+Drop real clips into `infra/test-streams/clips/<name>.mp4` to replace the test patterns ([SOURCES.md](infra/test-streams/SOURCES.md)).
+
+```bash
+# Core API on :8200
+cd services/core && uv sync && uv run python manage.py migrate
+uv run uvicorn config.asgi:application --port 8200 --reload
+
+# Dashboard on :3200
+pnpm install && pnpm dev:web
+
+# Vision worker
+cd services/vision && uv sync && uv run cammind-vision run
+```
+
+### Checks
+
+```bash
+cd services/core && uv run ruff check . && uv run mypy . && uv run pytest   # needs Postgres from docker compose
+cd services/vision && uv run ruff check . && uv run mypy src && uv run pytest
+cd packages/cammind-spec && uv run ruff check . && uv run mypy src && uv run pytest
+pnpm -r lint && pnpm -r typecheck && pnpm -r build
+```
+
+CI (`.github/workflows/ci.yml`) runs the same checks, on demand.

@@ -1,0 +1,84 @@
+# Local development infrastructure. Run from the repo root:
+#   docker compose -f infra/docker-compose.yml up -d
+# Host ports differ from WatchOnce's and InvoiceFlow's so all three can run (docs/04-tech-stack.md).
+name: cammind
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cammind
+      POSTGRES_PASSWORD: cammind
+      POSTGRES_DB: cammind
+    ports:
+      - "${POSTGRES_HOST_PORT:-5436}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cammind -d cammind"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_HOST_PORT:-6381}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # S3-compatible storage for snapshots and clips (Cloudflare R2 in the hosted demo).
+  s3:
+    image: chrislusf/seaweedfs:4.48
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json", "-ip.bind=0.0.0.0"]
+    ports:
+      - "${S3_HOST_PORT:-9200}:8333"
+    volumes:
+      - s3-data:/data
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9333/cluster/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # One-shot: create the private dev bucket.
+  s3-init:
+    image: chrislusf/seaweedfs:4.48
+    depends_on:
+      s3:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c", "echo 's3.bucket.create -name cammind-dev' | weed shell -master=s3:9333"]
+    restart: "no"
+
+  # Outbound alert emails land here in development. Web UI: http://localhost:8027
+  mailpit:
+    image: axllent/mailpit:v1.31.5
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1027}:1025"
+      - "${MAILPIT_HTTP_PORT:-8027}:8025"
+
+  # The only client of each camera: restreams RTSP to the vision worker and the clip recorder,
+  # and serves WebRTC to the dashboard (docs/07-video-pipeline.md). Web UI: http://localhost:1984
+  # API and RTSP are bound to localhost: live video must never be exposed (docs/14).
+  go2rtc:
+    image: alexxit/go2rtc:1.9.9
+    command: ["go2rtc", "-config", "/etc/go2rtc/go2rtc.yaml"]
+    ports:
+      - "127.0.0.1:${GO2RTC_API_PORT:-1984}:1984"
+      - "127.0.0.1:${GO2RTC_RTSP_PORT:-8554}:8554"
+      - "${GO2RTC_WEBRTC_PORT:-8555}:8555/tcp"
+      - "${GO2RTC_WEBRTC_PORT:-8555}:8555/udp"
+    volumes:
+      - ./go2rtc/go2rtc.yaml:/etc/go2rtc/go2rtc.yaml:ro
+
+volumes:
+  postgres-data:
+  redis-data:
+  s3-data:

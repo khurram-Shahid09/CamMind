@@ -1,0 +1,15 @@
+# go2rtc: one connection per camera, re-served to the vision worker, the clip recorder and the
+# dashboard (docs/07-video-pipeline.md).
+log:
+  level: warn
+
+api:
+  listen: ":1984"
+
+rtsp:
+  listen: ":8554"
+
+webrtc:
+  listen: ":8555"
+
+streams: {}

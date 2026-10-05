@@ -1,0 +1,32 @@
+[project]
+name = "cammind-spec"
+version = "0.1.0"
+description = "The CamMind rule spec (docs/05-rule-spec.md), shared by the core and the vision worker"
+requires-python = ">=3.13,<3.14"
+dependencies = ["pydantic"]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "mypy"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+# Versions policy (docs/04-tech-stack.md): never adopt a release younger than 2 weeks.
+exclude-newer = "2026-09-20T00:00:00Z"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = ["S101", "E501"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"

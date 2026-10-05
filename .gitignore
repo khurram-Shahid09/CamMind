@@ -1,29 +1,49 @@
-# Python
-__pycache__/
-*.pyc
-.venv/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Node
-node_modules/
-.next/
-
-# Env and secrets
+# Environment & secrets
 .env
 .env.*
 !.env.example
 
-# Media and models
-media/
-buffer/
-*.onnx
-infra/test-streams/*.mp4
-evals/clips/**/*.mp4
+# Dependencies
+node_modules/
+.pnpm-store/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build output
+.next/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+.coverage
+playwright-report/
+test-results/
+*.log
 
 # OS / editors
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Django
+services/core/staticfiles/
+services/core/media/
+
+# Next.js regenerates this on every dev/build run
+apps/web/next-env.d.ts
+
+# Video and models: large, licensed separately (infra/test-streams/SOURCES.md)
+infra/test-streams/clips/*
+!infra/test-streams/clips/.gitkeep
+*.onnx
+services/vision/buffer/
+evals/clips/**/*.mp4

@@ -1,0 +1,6 @@
+# Shell scripts and configs run inside Linux containers: keep LF line endings on Windows.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.mp4 binary
+*.onnx binary

@@ -1,0 +1,27 @@
+# Five fake cameras for development and evals (docs/07-video-pipeline.md, "Test streams").
+# Each path runs publish.sh, which loops clips/<name>.mp4 into the path, or a labelled test
+# pattern when the clip isn't there yet. Clips and their licences: SOURCES.md.
+logLevel: warn
+rtsp: yes
+rtspTransports: [tcp]
+rtmp: no
+hls: no
+webrtc: no
+srt: no
+
+paths:
+  home_backdoor:
+    runOnInit: sh /scripts/publish.sh home_backdoor
+    runOnInitRestart: yes
+  school_gate:
+    runOnInit: sh /scripts/publish.sh school_gate
+    runOnInitRestart: yes
+  school_parking:
+    runOnInit: sh /scripts/publish.sh school_parking
+    runOnInitRestart: yes
+  workshop_press:
+    runOnInit: sh /scripts/publish.sh workshop_press
+    runOnInitRestart: yes
+  office_reception:
+    runOnInit: sh /scripts/publish.sh office_reception
+    runOnInitRestart: yes

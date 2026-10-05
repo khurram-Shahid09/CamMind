@@ -1,5 +1,7 @@
 # Local development infrastructure. Run from the repo root:
 #   docker compose -f infra/docker-compose.yml up -d
+# With five looping test cameras (no hardware needed):
+#   docker compose -f infra/docker-compose.yml --profile test-streams up -d
 # Host ports differ from WatchOnce's and InvoiceFlow's so all three can run (docs/04-tech-stack.md).
 name: cammind
 
@@ -77,6 +79,18 @@ services:
       - "${GO2RTC_WEBRTC_PORT:-8555}:8555/udp"
     volumes:
       - ./go2rtc/go2rtc.yaml:/etc/go2rtc/go2rtc.yaml:ro
+
+  # Fake cameras: loops each clip in test-streams/clips as rtsp://mediamtx:8554/<name>
+  # (rtsp://localhost:8654/<name> from the host). Missing clips fall back to a test pattern.
+  mediamtx:
+    profiles: ["test-streams"]
+    image: bluenviron/mediamtx:1.12.3-ffmpeg
+    ports:
+      - "127.0.0.1:${TEST_STREAMS_RTSP_PORT:-8654}:8554"
+    volumes:
+      - ./test-streams/mediamtx.yml:/mediamtx.yml:ro
+      - ./test-streams/publish.sh:/scripts/publish.sh:ro
+      - ./test-streams/clips:/clips:ro
 
 volumes:
   postgres-data:

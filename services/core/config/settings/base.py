@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "common",
     "accounts",
     "audit",
+    "cameras",
 ]
 
 MIDDLEWARE = [
@@ -178,6 +179,20 @@ S3_BUCKET = env.str("S3_BUCKET", default="cammind-dev").strip()
 S3_ACCESS_KEY_ID = env.str("S3_ACCESS_KEY_ID", default="").strip()
 S3_SECRET_ACCESS_KEY = env.str("S3_SECRET_ACCESS_KEY", default="").strip()
 S3_REGION = env.str("S3_REGION", default="us-east-1").strip()
+
+# --- Cameras and go2rtc (docs/07-video-pipeline.md) ---
+GO2RTC_URL = env.str("GO2RTC_URL", default="http://localhost:1984").strip()
+CAMERA_PROBE_TIMEOUT_S = env.float("CAMERA_PROBE_TIMEOUT_S", default=5.0)
+
+
+def _aliases(raw: str) -> dict[str, str]:
+    """ "mediamtx:8554=localhost:8654,..." -> {"mediamtx:8554": "localhost:8654"}"""
+    pairs = (item.split("=", 1) for item in raw.split(",") if "=" in item)
+    return {name.strip().lower(): target.strip() for name, target in pairs}
+
+
+# Development only: lets the core reach test cameras that only have a name inside Docker.
+CAMERA_HOST_ALIASES = _aliases(env.str("CAMERA_HOST_ALIASES", default=""))
 
 # --- AI: rule compiler and verification (docs/06, docs/09) ---
 LLM_PROVIDER = env.str("LLM_PROVIDER", default="fake").strip().lower()  # gemini | fake

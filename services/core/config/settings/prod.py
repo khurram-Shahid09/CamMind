@@ -14,5 +14,7 @@ if len(SECRET_KEY) < 50:  # noqa: F405
     raise RuntimeError("DJANGO_SECRET_KEY must be at least 50 characters in production")
 if not FIELD_ENCRYPTION_KEY:  # noqa: F405
     raise RuntimeError("FIELD_ENCRYPTION_KEY is required in production")
+if CAMERA_HOST_ALIASES:  # noqa: F405
+    raise RuntimeError("CAMERA_HOST_ALIASES is for development only")
 
 SENTRY_ENVIRONMENT = env.str("SENTRY_ENVIRONMENT", default="production")  # noqa: F405

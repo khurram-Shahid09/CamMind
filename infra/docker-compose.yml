@@ -69,15 +69,18 @@ services:
   # The only client of each camera: restreams RTSP to the vision worker and the clip recorder,
   # and serves WebRTC to the dashboard (docs/07-video-pipeline.md). Web UI: http://localhost:1984
   # API and RTSP are bound to localhost: live video must never be exposed (docs/14).
+  # Streams are managed by the core through the API; go2rtc saves them in the first config
+  # (a volume) and merges the read-only settings from the repo.
   go2rtc:
     image: alexxit/go2rtc:1.9.9
-    command: ["go2rtc", "-config", "/etc/go2rtc/go2rtc.yaml"]
+    command: ["go2rtc", "-config", "/config/go2rtc.yaml", "-config", "/etc/go2rtc/go2rtc.yaml"]
     ports:
       - "127.0.0.1:${GO2RTC_API_PORT:-1984}:1984"
       - "127.0.0.1:${GO2RTC_RTSP_PORT:-8554}:8554"
       - "${GO2RTC_WEBRTC_PORT:-8555}:8555/tcp"
       - "${GO2RTC_WEBRTC_PORT:-8555}:8555/udp"
     volumes:
+      - go2rtc-config:/config
       - ./go2rtc/go2rtc.yaml:/etc/go2rtc/go2rtc.yaml:ro
 
   # Fake cameras: loops each clip in test-streams/clips as rtsp://mediamtx:8554/<name>
@@ -96,3 +99,4 @@ volumes:
   postgres-data:
   redis-data:
   s3-data:
+  go2rtc-config:

@@ -1,5 +1,6 @@
 # go2rtc: one connection per camera, re-served to the vision worker, the clip recorder and the
-# dashboard (docs/07-video-pipeline.md).
+# dashboard (docs/07-video-pipeline.md). Streams aren't listed here: the core adds one pair per
+# camera through the API (<camera id> and <camera id>_hd; services/core/cameras/service.py).
 log:
   level: warn
 
@@ -11,11 +12,3 @@ rtsp:
 
 webrtc:
   listen: ":8555"
-
-# The five fake cameras from MediaMTX (profile "test-streams").
-streams:
-  home_backdoor: rtsp://mediamtx:8554/home_backdoor
-  school_gate: rtsp://mediamtx:8554/school_gate
-  school_parking: rtsp://mediamtx:8554/school_parking
-  workshop_press: rtsp://mediamtx:8554/workshop_press
-  office_reception: rtsp://mediamtx:8554/office_reception

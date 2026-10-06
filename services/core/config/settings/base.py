@@ -166,7 +166,10 @@ CELERY_TASK_DEFAULT_QUEUE = "actions"
 CELERY_TASK_ROUTES = {
     f"{queue}.*": {"queue": queue, "routing_key": queue} for queue in CELERY_QUEUES
 }
-CELERY_BEAT_SCHEDULE: dict = {}
+CELERY_BEAT_SCHEDULE = {
+    # A restarted go2rtc gets its streams back within a minute.
+    "sync-go2rtc": {"task": "media.sync_go2rtc", "schedule": 60},
+}
 
 # --- Encryption of camera URLs and channel secrets (docs/14-security-privacy.md) ---
 FIELD_ENCRYPTION_KEY = env.str("FIELD_ENCRYPTION_KEY", default="").strip()

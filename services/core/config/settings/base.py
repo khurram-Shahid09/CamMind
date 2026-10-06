@@ -133,6 +133,18 @@ CELERY_TASK_ROUTES = {
 }
 CELERY_BEAT_SCHEDULE: dict = {}
 
+# --- Encryption of camera URLs and channel secrets (docs/14-security-privacy.md) ---
+FIELD_ENCRYPTION_KEY = env.str("FIELD_ENCRYPTION_KEY", default="").strip()
+
+# --- Snapshots and clips (docs/04-tech-stack.md) ---
+STORAGE_BACKEND = env.str("STORAGE_BACKEND", default="s3").strip()  # s3 | local
+MEDIA_ROOT = Path(env.str("MEDIA_ROOT", default=str(CORE_DIR / "media")))
+S3_ENDPOINT = env.str("S3_ENDPOINT", default="http://localhost:9200").strip()
+S3_BUCKET = env.str("S3_BUCKET", default="cammind-dev").strip()
+S3_ACCESS_KEY_ID = env.str("S3_ACCESS_KEY_ID", default="").strip()
+S3_SECRET_ACCESS_KEY = env.str("S3_SECRET_ACCESS_KEY", default="").strip()
+S3_REGION = env.str("S3_REGION", default="us-east-1").strip()
+
 # --- Logging: single-line logs to stdout ---
 LOGGING = {
     "version": 1,

@@ -204,6 +204,9 @@ GEMINI_MODELS = [
     m.strip() for m in env.list("GEMINI_MODELS", default=["gemini-3.6-flash", "gemini-3.5-flash"])
 ]
 
+# --- Demo workspace (manage.py seed_demo) ---
+DEMO_PASSWORD = env.str("DEMO_PASSWORD", default="").strip()
+
 # --- Logging: single-line logs to stdout ---
 LOGGING = {
     "version": 1,

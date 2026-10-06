@@ -1,8 +1,19 @@
 # 15 · Roadmap & Build Plan
 
-## Status (30 Oct 2026)
+## Status (6 Oct 2026)
 
-Design docs complete. Build not started. Next step: create the repo and start day 1.
+Days 1–2 done. Next: day 3, the vision worker's intake, motion gate and detector benchmark.
+
+| Built | Where |
+|---|---|
+| Local stack: Postgres, Redis, SeaweedFS, Mailpit, go2rtc; five looping MediaMTX test cameras | `infra/` |
+| Django skeleton: settings per environment, health checks, error envelope, Celery queues | `services/core/config`, `common` |
+| Orgs, sites, 4 roles with per-site access, JWT + API tokens, append-only audit log | `accounts`, `audit` |
+| Cameras: encrypted URLs, RTSP check with clear error codes, go2rtc sync, snapshots in S3, admin with preview | `cameras` |
+| Shared LLM wrapper (Gemini + fake), storage, field encryption | `common` |
+| Skeletons: vision worker CLI, rule spec package, Next.js dashboard, CI workflow | `services/vision`, `packages/cammind-spec`, `apps/web`, `.github` |
+
+Changes from the plan: the three Python projects are separate `uv` projects (the core and the vision worker get their own lock files and, later, their own images) and the shared spec package is a path dependency. Test clips aren't downloaded yet: cameras without a clip show a moving test pattern, which is enough until detection (day 3).
 
 ## Phases
 
@@ -28,7 +39,7 @@ A **demo-able cut lands at day 10**. Days 11–15 harden it, run evals and launc
 
 | Day | Build | Done when |
 |---|---|---|
-| 1 | Repo, `uv` workspaces (`services/core`, `services/vision`, `packages/cammind-spec`), Next.js app, `infra/docker-compose.yml` (Postgres, Redis, SeaweedFS, Mailpit, go2rtc, MediaMTX test streams), CI skeleton. Download 5 test clips; write `SOURCES.md` | `docker compose up` shows 5 looping test cameras in go2rtc's web UI |
+| 1 | Repo, `uv` projects (`services/core`, `services/vision`, `packages/cammind-spec`), Next.js app, `infra/docker-compose.yml` (Postgres, Redis, SeaweedFS, Mailpit, go2rtc, MediaMTX test streams), CI skeleton. Download 5 test clips; write `SOURCES.md` | `docker compose up` shows 5 looping test cameras in go2rtc's web UI |
 | 2 | Core: orgs, sites, cameras (encrypted URLs), camera test endpoint, go2rtc config sync, snapshots. Copy the auth, org scoping, audit and LLM wrapper modules from InvoiceFlow | Add a camera by URL in the admin and see its snapshot |
 | 3 | Vision: intake (PyAV, reconnect, sampling, health), motion gate, detector benchmark (RT-DETRv2-S vs D-FINE-S on CPU; pick one), ONNX session | Worker logs detections for 4 test streams at 5 fps on the laptop CPU; numbers written into [04](04-tech-stack.md#hardware-targets) |
 | 4 | Tracking (ByteTrack), geometry (zones, lines), annotated debug view (MJPEG on the worker's metrics port) | Debug view shows stable track IDs and zone hits |

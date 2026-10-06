@@ -8,30 +8,33 @@ Conventions: cursor pagination (`?cursor=…&limit=50`), errors as `{"error": {"
 
 | Method | Path | Notes |
 |---|---|---|
-| POST | `/auth/login` | Email + password → session (BFF) |
+| POST | `/auth/register` | Email, password, `org_name`, `tier`, `timezone` → new workspace (caller is its owner) with a first site |
+| POST | `/auth/login` | Email + password → access JWT; rotating refresh token in an httpOnly cookie |
+| POST | `/auth/refresh` | New access token; reusing a rotated refresh token revokes the whole session family |
 | POST | `/auth/logout` | |
-| GET | `/me` | User, memberships, roles, site access |
+| GET | `/me` | User, memberships (`role`, `all_sites`, `site_ids`), the token in use |
 | GET / PATCH | `/org` | Name, tier, settings (retention, budgets) |
-| GET / POST | `/org/members` | Invite by email with role and sites |
-| PATCH / DELETE | `/org/members/{id}` | |
-| GET / POST / DELETE | `/org/tokens` | API tokens (secret shown once) |
+| GET / POST | `/orgs/{org_id}/members` | Add an existing user by email with `role`, `all_sites`, `site_ids` |
+| GET / PATCH / DELETE | `/orgs/{org_id}/members/{id}` | Admins can't touch owners; the last owner can't leave (`409 last_owner`) |
+| GET / POST | `/tokens` | API tokens (`pat_…`, secret shown once); a token can't mint tokens |
+| DELETE | `/tokens/{id}` | Revoke |
 
 ## Sites
 
 | Method | Path | Notes |
 |---|---|---|
 | GET / POST | `/sites` | |
-| GET / PATCH / DELETE | `/sites/{id}` | |
+| GET / PATCH / DELETE | `/sites/{id}` | `DELETE` → `409 site_not_empty` while it has cameras |
 | GET / PUT | `/sites/{id}/calendars/{kind}` | Weekly hours + holidays |
 
 ## Cameras
 
 | Method | Path | Notes |
 |---|---|---|
-| POST | `/cameras/test` | `{rtsp_url}` → `{ok, error_code, codec, width, height, fps, snapshot_url}`. Error codes: `unreachable`, `auth_failed`, `not_found`, `unsupported_codec`, `timeout` |
-| GET / POST | `/cameras` | `rtsp_main`, `rtsp_sub` (write-only), `name`, `site_id`, `detect_fps`, `cloud_ai_allowed` |
-| GET / PATCH / DELETE | `/cameras/{id}` | Response has `rtsp_main_masked` only |
-| GET | `/cameras/{id}/snapshot` | Fresh JPEG (via go2rtc `frame.jpeg`) |
+| POST | `/cameras/test` | `{rtsp_url}` → `{ok, error_code, message, codec, fps, width, height, warnings, snapshot_jpeg_base64}`. Error codes: `invalid_url`, `unreachable`, `timeout`, `auth_failed`, `not_found`, `unsupported_codec`, `rtsp_error`. Warnings flag factory passwords |
+| GET / POST | `/cameras` | `rtsp_main`, `rtsp_sub` (write-only), `name`, `site_id`, `detect_fps`, `cloud_ai_allowed`, `enabled`. Both URLs are checked before saving (`400 camera_check_failed` with the error code) |
+| GET / PATCH / DELETE | `/cameras/{id}` | Response has `rtsp_main_masked` / `rtsp_sub_masked` only. Changing a URL re-checks it |
+| GET | `/cameras/{id}/snapshot` | Last stored JPEG; `?fresh=1` grabs a new one via go2rtc (`502 camera_unavailable` if it can't) |
 | GET | `/cameras/{id}/live` | `{webrtc_url, mse_url}` with a short-lived token for go2rtc |
 | GET | `/cameras/{id}/health?since=` | History for the health chart |
 

@@ -11,7 +11,7 @@ CamMind turns any RTSP IP camera into an AI watcher. You write a rule the way yo
 
 CamMind compiles the rule into a precise, checkable spec, shows you what it understood, and once you confirm, it watches the stream. When the rule is met it sends an alert with a snapshot and a short clip, by email, Telegram, Slack or webhook, and logs the event for review.
 
-> **Status:** 🏗️ Building the MVP: repo, infrastructure and test cameras are in place. See the [roadmap](docs/15-roadmap-build-plan.md).
+> **Status:** 🏗️ Building the MVP: accounts, sites and cameras (checked, encrypted, with snapshots) work; the vision pipeline is next. See the [roadmap](docs/15-roadmap-build-plan.md).
 
 ---
 
@@ -156,10 +156,15 @@ docker compose -f infra/docker-compose.yml --profile test-streams up -d
 
 Drop real clips into `infra/test-streams/clips/<name>.mp4` to replace the test patterns ([SOURCES.md](infra/test-streams/SOURCES.md)).
 
+In development the core reaches the test cameras through `CAMERA_HOST_ALIASES` (`mediamtx:8554` → `localhost:8654`); real cameras on your network need no alias. API docs: http://localhost:8200/api/v1/docs/
+
 ```bash
 # Core API on :8200
 cd services/core && uv sync && uv run python manage.py migrate
+uv run python manage.py seed_demo          # demo workspace: 3 sites, 4 users, the 5 test cameras
+uv run python manage.py createsuperuser    # for the admin at http://localhost:8200/admin/
 uv run uvicorn config.asgi:application --port 8200 --reload
+uv run celery -A config worker -B -Q compile,verify,media,actions --pool=solo -l info
 
 # Dashboard on :3200
 pnpm install && pnpm dev:web

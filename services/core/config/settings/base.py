@@ -179,6 +179,13 @@ S3_ACCESS_KEY_ID = env.str("S3_ACCESS_KEY_ID", default="").strip()
 S3_SECRET_ACCESS_KEY = env.str("S3_SECRET_ACCESS_KEY", default="").strip()
 S3_REGION = env.str("S3_REGION", default="us-east-1").strip()
 
+# --- AI: rule compiler and verification (docs/06, docs/09) ---
+LLM_PROVIDER = env.str("LLM_PROVIDER", default="fake").strip().lower()  # gemini | fake
+GEMINI_API_KEYS = [k.strip() for k in env.list("GEMINI_API_KEYS", default=[]) if k.strip()]
+GEMINI_MODELS = [
+    m.strip() for m in env.list("GEMINI_MODELS", default=["gemini-3.6-flash", "gemini-3.5-flash"])
+]
+
 # --- Logging: single-line logs to stdout ---
 LOGGING = {
     "version": 1,

@@ -18,3 +18,5 @@ PASSWORD_HASHERS = [
 CELERY_TASK_ALWAYS_EAGER = True
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 STORAGE_BACKEND = "local"  # each test points MEDIA_ROOT at a temporary folder
+LLM_PROVIDER = "fake"  # tests never call a real AI
+GEMINI_API_KEYS = []

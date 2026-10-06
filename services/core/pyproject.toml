@@ -20,6 +20,9 @@ dependencies = [
     "httpx",
     "cryptography",
     "sentry-sdk",
+    "boto3",
+    "pillow",
+    "google-genai",
 ]
 
 [dependency-groups]

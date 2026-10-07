@@ -2,7 +2,7 @@
 
 ## Status (6 Oct 2026)
 
-Days 1–2 done. Next: day 3, the vision worker's intake, motion gate and detector benchmark.
+Days 1–2 done. The rest of this week follows the [demo sprint](20-demo-sprint.md): eight small steps to a demo-ready build; everything else is listed there as pending for next week.
 
 | Built | Where |
 |---|---|

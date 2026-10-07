@@ -122,6 +122,7 @@ Same core as WatchOnce and [InvoiceFlow](https://github.com/khurram-Shahid09/Inv
 | 17 | [Deployment & ops](docs/17-deployment-ops.md) | Local, edge box, hosted demo, monitoring |
 | 18 | [Demo script](docs/18-demo-script.md) | The 2-minute video |
 | 19 | [Open questions](docs/19-open-questions.md) | Decisions and inputs needed |
+| 20 | [Demo sprint](docs/20-demo-sprint.md) | This week's steps to a demo, and what's pending for next week |
 | ADR | [Decision records](docs/adr/) | Why the key choices were made |
 
 ## Repository layout

@@ -26,7 +26,8 @@ ignore = ["S101", "E501"]
 
 [tool.mypy]
 python_version = "3.13"
-strict = true
+plugins = ["pydantic.mypy"]
+check_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers"

@@ -4,9 +4,15 @@ version = "0.1.0"
 description = "CamMind vision worker: RTSP -> motion -> detection -> tracking -> rule engine -> events"
 requires-python = ">=3.13,<3.14"
 dependencies = [
+    "av",
     "cammind-spec",
     "httpx",
+    "numpy",
+    "onnxruntime",
+    "opencv-python-headless",
     "pydantic",
+    "supervision",
+    "tzdata",
 ]
 
 [project.scripts]

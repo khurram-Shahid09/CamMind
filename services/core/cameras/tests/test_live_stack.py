@@ -39,4 +39,4 @@ def test_probe_a_missing_path() -> None:
 
 def test_preview_through_go2rtc() -> None:
     jpeg = preview_snapshot("rtsp://mediamtx:8554/workshop_press", Go2rtc(GO2RTC))
-    assert jpeg and image_size(jpeg) == (640, 360)
+    assert jpeg and image_size(jpeg) == (1920, 1080)  # the workshop clip

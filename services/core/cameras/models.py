@@ -82,3 +82,27 @@ class Camera(OrgOwnedModel, TimeStampedModel):
     @property
     def sub_url_masked(self) -> str:
         return rtsp.mask(self.sub_url) if self.rtsp_sub_enc else ""
+
+
+class Zone(OrgOwnedModel, TimeStampedModel):
+    """An area (polygon) or a line drawn on a camera; points are normalised 0-1."""
+
+    id = PrefixedIdField(prefix="zn")
+    camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name="zones")
+    name = models.CharField(max_length=80)
+    kind = models.CharField(max_length=8, choices=[("polygon", "Area"), ("line", "Line")])
+    points = models.JSONField()  # [[x, y], ...]
+    in_side = models.CharField(max_length=5, default="right")  # lines: "left" | "right"
+
+    class Meta:
+        db_table = "zones"
+        constraints = [
+            models.UniqueConstraint(fields=["camera", "name"], name="zones_camera_name_unique")
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs) -> None:
+        self.org_id = self.camera.org_id
+        super().save(*args, **kwargs)

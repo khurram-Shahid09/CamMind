@@ -3,7 +3,7 @@ from rest_framework import serializers
 from accounts.models import Site
 
 from . import rtsp
-from .models import Camera
+from .models import Camera, Zone
 
 
 def _url(value: str) -> str:
@@ -81,3 +81,32 @@ class CameraTestResultSerializer(serializers.Serializer):
     height = serializers.IntegerField(allow_null=True)
     warnings = serializers.ListField(child=serializers.CharField())
     snapshot_jpeg_base64 = serializers.CharField(allow_null=True)
+
+
+class ZoneSerializer(serializers.ModelSerializer):
+    camera_id = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Zone
+        fields = ["id", "camera_id", "name", "kind", "points", "in_side", "created_at"]
+        read_only_fields = ["id", "created_at"]
+        validators: list = []
+
+    def validate(self, attrs):
+        points = attrs.get("points", getattr(self.instance, "points", []))
+        kind = attrs.get("kind", getattr(self.instance, "kind", "polygon"))
+        ok = isinstance(points, list) and all(
+            isinstance(p, list | tuple)
+            and len(p) == 2
+            and all(isinstance(v, int | float) and 0 <= v <= 1 for v in p)
+            for p in points
+        )
+        if not ok:
+            raise serializers.ValidationError({"points": "A list of [x, y] pairs between 0 and 1."})
+        if (kind == "line" and len(points) != 2) or (
+            kind == "polygon" and not 3 <= len(points) <= 20
+        ):
+            raise serializers.ValidationError({"points": "A line has 2 points; an area 3 to 20."})
+        if attrs.get("in_side", "right") not in ("left", "right"):
+            raise serializers.ValidationError({"in_side": "left or right"})
+        return attrs

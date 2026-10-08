@@ -2,7 +2,7 @@ import base64
 import logging
 from typing import cast
 
-from django.db import transaction
+from django.db import models, transaction
 from django.http import HttpResponse
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -20,11 +20,12 @@ from common.storage import StorageError, storage
 
 from . import service
 from .go2rtc import Go2rtcError
-from .models import Camera
+from .models import Camera, Zone
 from .serializers import (
     CameraSerializer,
     CameraTestRequestSerializer,
     CameraTestResultSerializer,
+    ZoneSerializer,
 )
 
 log = logging.getLogger(__name__)
@@ -204,3 +205,62 @@ class CameraSnapshotView(_CameraViewMixin, generics.GenericAPIView):
         response = HttpResponse(jpeg, content_type="image/jpeg")
         response["Cache-Control"] = "private, no-store"
         return response
+
+
+class ZoneListView(OrgScopedViewMixin, generics.ListCreateAPIView):
+    queryset = Zone.objects.select_related("camera")
+    site_field = "camera__site"
+    method_roles = {"POST": MANAGERS}
+    pagination_class = None
+
+    serializer_class = ZoneSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().filter(camera_id=self.kwargs["camera_id"])
+
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        camera = Camera.objects.for_org(self.org).filter(pk=self.kwargs["camera_id"]).first()
+        if camera is None or not self.membership.can_access_site(camera.site_id):
+            raise ApiError("camera_not_found", "No such camera.", status_code=404)
+        if camera.zones.filter(name=serializer.validated_data["name"]).exists():
+            raise ApiError(
+                "zone_exists", "This camera already has a zone with this name.", status_code=409
+            )
+        zone = serializer.save(camera=camera)
+        record(
+            "zone.created",
+            org=self.org,
+            request=self.request,
+            entity=zone,
+            metadata={"name": zone.name},
+        )
+
+
+class ZoneDetailView(OrgScopedViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Zone.objects.select_related("camera")
+    site_field = "camera__site"
+    lookup_url_kwarg = "zone_id"
+    method_roles = {"PATCH": MANAGERS, "DELETE": MANAGERS}
+    http_method_names = ["get", "patch", "delete", "head", "options"]
+
+    serializer_class = ZoneSerializer
+
+    def perform_destroy(self, instance) -> None:
+        from rules.models import RuleVersion
+
+        using = RuleVersion.objects.for_org(self.org).filter(
+            rule__current_version_id=models.F("id"), spec__icontains=instance.id
+        )
+        names = list(using.values_list("rule__name", flat=True))
+        if names:
+            raise ApiError(
+                "zone_in_use", "Rules use this zone.", status_code=409, details={"rules": names}
+            )
+        record(
+            "zone.deleted",
+            org=self.org,
+            request=self.request,
+            entity=instance,
+            metadata={"name": instance.name},
+        )
+        instance.delete()

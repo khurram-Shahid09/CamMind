@@ -6,6 +6,8 @@ urlpatterns = [
     path("cameras/test", views.CameraTestView.as_view(), name="camera-test"),
     path("cameras", views.CameraListView.as_view(), name="camera-list"),
     path("cameras/<str:camera_id>", views.CameraDetailView.as_view(), name="camera-detail"),
+    path("cameras/<str:camera_id>/zones", views.ZoneListView.as_view(), name="zone-list"),
+    path("zones/<str:zone_id>", views.ZoneDetailView.as_view(), name="zone-detail"),
     path(
         "cameras/<str:camera_id>/snapshot",
         views.CameraSnapshotView.as_view(),

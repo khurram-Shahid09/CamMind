@@ -57,7 +57,11 @@ class Tracker:
         )
         seen = []
         for box, confidence, class_id, track_id in zip(
-            tracked.xyxy, tracked.confidence, tracked.class_id, tracked.tracker_id, strict=True
+            tracked.xyxy,
+            tracked.confidence,  # type: ignore[arg-type]  # set: we passed confidences
+            tracked.class_id,  # type: ignore[arg-type]
+            tracked.tracker_id,  # type: ignore[arg-type]
+            strict=True,
         ):
             tid = int(track_id)
             track = self.tracks.get(tid)

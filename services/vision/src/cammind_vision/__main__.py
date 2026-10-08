@@ -38,10 +38,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="go2rtc RTSP base URL; cameras are read from <restream>/<camera_id>",
     )
     run.add_argument(
-        "--cameras",
-        default="",
-        help="Comma-separated camera ids (default: every camera assigned to this worker)",
+        "--token", default=os.environ.get("WORKER_TOKEN", ""), help="Shared worker token"
     )
+    run.add_argument(
+        "--source",
+        action="append",
+        default=[],
+        metavar="CAMERA_ID=PATH",
+        help="Read this camera from a file or URL instead of the restream (demos, evals)",
+    )
+    run.add_argument("--data", type=Path, default=Path("buffer"), help="Outbox folder")
 
     detect = sub.add_parser("detect", help="Run motion, detection and tracking on one stream")
     detect.add_argument("source", help="rtsp://... or a video file")
@@ -59,10 +65,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
-    cameras = [c for c in args.cameras.split(",") if c]
-    log.info("cammind-vision %s: core=%s cameras=%s", __version__, args.core, cameras or "assigned")
-    log.warning("Reporting events to the core arrives in step 3 (docs/20-demo-sprint.md).")
-    return 0
+    from .worker import run_forever
+
+    if not args.token:
+        log.error("Set WORKER_TOKEN (the same value as the core's).")
+        return 2
+    sources = dict(item.split("=", 1) for item in args.source)
+    log.info("cammind-vision %s: core=%s restream=%s", __version__, args.core, args.restream)
+    return run_forever(args.core, args.token, args.restream, sources, args.data)
 
 
 def cmd_detect(args: argparse.Namespace) -> int:
@@ -138,7 +148,19 @@ def cmd_bench(args: argparse.Namespace) -> int:
     return 0
 
 
+def load_dotenv() -> None:
+    """Read the repo-root .env (development); real environment variables win."""
+    path = Path(__file__).resolve().parents[4] / ".env"
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        name, sep, value = line.partition("=")
+        if sep and name.strip() and not name.lstrip().startswith("#"):
+            os.environ.setdefault(name.strip(), value.split(" #")[0].strip())
+
+
 def main(argv: list[str] | None = None) -> int:
+    load_dotenv()
     args = build_parser().parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     commands = {"run": cmd_run, "detect": cmd_detect, "bench": cmd_bench}

@@ -71,8 +71,8 @@ def _objects(tracks: list[Track]) -> list[dict]:
         {
             "track_id": t.id,
             "class": t.class_name,
-            "conf": round(t.confidence, 3),
-            "box": [round(v, 1) for v in t.box],
+            "conf": round(float(t.confidence), 3),
+            "box": [round(float(v), 1) for v in t.box],
         }
         for t in tracks
     ]

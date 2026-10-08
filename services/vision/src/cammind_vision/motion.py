@@ -62,8 +62,8 @@ class MotionGate:
             return MotionResult(False, 0.0)
 
         diff = cv2.absdiff(small, self._background)
-        changed = (diff > self.threshold).astype(np.uint8)
-        changed = cv2.morphologyEx(changed, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
+        raw = (diff > self.threshold).astype(np.uint8)
+        changed = cv2.morphologyEx(raw, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
         whole = float(changed.mean())
         if whole > LIGHT_CHANGE_FRACTION:
             self._background = small

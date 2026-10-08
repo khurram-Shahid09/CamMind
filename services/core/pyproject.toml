@@ -23,6 +23,7 @@ dependencies = [
     "boto3",
     "pillow",
     "google-genai",
+    "cammind-spec",
 ]
 
 [dependency-groups]
@@ -40,6 +41,9 @@ package = false
 # Versions policy (docs/04-tech-stack.md): never adopt a release younger than 2 weeks.
 # Bump this date deliberately when upgrading dependencies.
 exclude-newer = "2026-09-20T00:00:00Z"
+
+[tool.uv.sources]
+cammind-spec = { path = "../../packages/cammind-spec", editable = true }
 
 [tool.ruff]
 line-length = 100

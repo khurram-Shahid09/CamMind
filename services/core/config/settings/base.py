@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "accounts",
     "audit",
     "cameras",
+    "rules",
+    "events",
 ]
 
 MIDDLEWARE = [
@@ -196,6 +198,12 @@ def _aliases(raw: str) -> dict[str, str]:
 
 # Development only: lets the core reach test cameras that only have a name inside Docker.
 CAMERA_HOST_ALIASES = _aliases(env.str("CAMERA_HOST_ALIASES", default=""))
+
+# --- Vision worker (docs/12-api-spec.md, "Internal") ---
+WORKER_TOKEN = env.str("WORKER_TOKEN", default="").strip()
+
+# --- Alerts (docs/10-actions-and-notifications.md) ---
+SLACK_WEBHOOK_URL = env.str("SLACK_WEBHOOK_URL", default="").strip()
 
 # --- AI: rule compiler and verification (docs/06, docs/09) ---
 LLM_PROVIDER = env.str("LLM_PROVIDER", default="fake").strip().lower()  # gemini | fake

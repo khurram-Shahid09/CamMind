@@ -21,3 +21,5 @@ STORAGE_BACKEND = "local"  # each test points MEDIA_ROOT at a temporary folder
 LLM_PROVIDER = "fake"  # tests never call a real AI
 GEMINI_API_KEYS = []
 CAMERA_PROBE_TIMEOUT_S = 1.0
+WORKER_TOKEN = "test-worker-token"  # noqa: S105
+SLACK_WEBHOOK_URL = ""

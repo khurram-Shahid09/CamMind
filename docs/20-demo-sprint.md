@@ -12,8 +12,8 @@ Each step ends with tests passing, commits pushed, and this table updated.
 |---|---|---|---|
 | 1 | **Vision intake:** PyAV reader with reconnects, motion gate, ONNX detector (auto-download, CPU/DirectML), ByteTrack, zone and line geometry; `cammind-vision detect` prints tracks for a stream | Tracks stable on a test stream; detector speed measured on this laptop | ✅ D-FINE-S picked: 150 ms/frame on CPU (D-FINE-N 68 ms, RT-DETRv2-S 240–380 ms and more false positives) |
 | 2 | **Rule spec + engine:** Pydantic models in `cammind-spec`; engine for presence, count, dwell, absence, crossing with schedule, hold and cooldown; unit tests with synthetic tracks | ~50 engine tests green | ✅ spec models + engine for all five conditions, schedules, hold, cooldown, long-event split |
-| 3 | **Worker ↔ core:** zones model and API, `/internal/config`, `/internal/events` with idempotency, worker outbox, event model and states, snapshots with boxes | A person walking into a zone on a clip creates one event with a snapshot | ⬜ |
-| 4 | **Alerts and clips:** segment recorder, clip cutting, Telegram (photo, then clip) and in-app SSE | Event → Telegram photo in < 3 s, clip follows | ⬜ |
+| 3 | **Worker ↔ core:** zones model and API, `/internal/config`, `/internal/events` with idempotency, worker outbox, event model and states, snapshots with boxes | A person walking into a zone on a clip creates one event with a snapshot | ✅ zones, rules with versions, internal API, worker loop with SQLite outbox; real events with snapshot + crop |
+| 4 | **Alerts and clips:** segment recorder, clip cutting, Telegram (photo, then clip) and in-app SSE | Event → Telegram photo in < 3 s, clip follows | ✅ Slack instead of Telegram (webhook); clips moved to pending |
 | 5 | **Rule compiler:** prompt, structured output, validation + one repair, questions and refusals; `POST /rules/compile`, rules API with versions | The 5 rules in the demo script compile correctly (Gemini and the offline fake) | ⬜ |
 | 6 | **Verification (helmet only):** crops, yes/no check, recheck, budgets, "unverified" fallback, injection-safe decision | Helmet clip: no-helmet person confirmed, helmeted person dismissed, paper-sign scene unchanged | ⬜ |
 | 7 | **Dashboard:** login, live grid, camera page with zone editor, new-rule flow with the summary card, events timeline and event detail | Full flow in the browser: camera → zone → rule → event | ⬜ |
@@ -47,6 +47,7 @@ Built after the demo, in this order. Each item links to the doc that specifies i
 
 | Item | Spec |
 |---|---|
+| Event clips (segment recorder + clip cutting) and Telegram | [07](07-video-pipeline.md#6--clips-seg-recorder--media), [10](10-actions-and-notifications.md) |
 | Full eval suite: ~80 compiler sentences, ≥ 25 labelled clips, verification crop sets, injection scenes, reports in CI | [16](16-testing-and-evals.md) |
 | `scene` rules (package, blocked exit, spill) and `frame_strip` rules (fall, fight, climbing) with motion triggers | [05](05-rule-spec.md), [08](08-rule-engine-and-events.md#verify-triggers) |
 | Email, Slack and signed webhooks; delivery retries, rate limits, grouping, quiet hours | [10](10-actions-and-notifications.md) |

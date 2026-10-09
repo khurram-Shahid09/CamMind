@@ -13,9 +13,11 @@ from django.db import transaction
 from accounts.models import Membership, Organization, Role, Site, Tier, User
 from audit.service import record
 from cameras.go2rtc import Go2rtcError
-from cameras.models import Camera
+from cameras.models import Camera, Zone
 from cameras.service import refresh_snapshot, sync_go2rtc
 from common.storage import StorageError
+from rules.models import Rule, RuleVersion
+from rules.service import summarize, validate_spec
 
 ORG_NAME = "CamMind Demo"
 SITES = ["Home", "Green Valley School", "Workshop"]
@@ -28,6 +30,38 @@ CAMERAS = [
     ("Workshop", "Press line", "workshop_press"),
     ("Workshop", "Reception", "office_reception"),
 ]
+ZONES = [
+    # camera, zone, kind, points (normalised), in_side
+    (
+        "Back door",
+        "Back door",
+        "polygon",
+        [[0.3, 0.6], [0.8, 0.6], [0.8, 1.0], [0.3, 1.0]],
+        "right",
+    ),
+    ("Main gate", "Gate line", "line", [[0.0, 0.5], [1.0, 0.5]], "right"),
+    (
+        "Press line",
+        "Press area",
+        "polygon",
+        [[0.15, 0.35], [0.85, 0.35], [0.95, 1.0], [0.05, 1.0]],
+        "right",
+    ),
+]
+# The demo script's rules (docs/18), as the compiler produces them; ids are filled in below.
+RULES = [
+    ("Home", "Someone at the back door", "Alert me if anyone stands at the back door for 3 seconds",
+     {"where": {"type": "zone", "zones": ["Back door"]}, "condition": {"type": "presence"},
+      "timing": {"hold_seconds": 3, "cooldown_seconds": 60}}, ["Back door"]),
+    ("Green Valley School", "Entry through the gate", "Tell security if anyone enters through the gate",
+     {"where": {"type": "line", "line": "Gate line", "direction": "any"}, "condition": {"type": "crossing"},
+      "timing": {"cooldown_seconds": 30}}, ["Main gate"]),
+    ("Workshop", "No helmet in the press area", "Flag any worker in the press area without a helmet",
+     {"where": {"type": "zone", "zones": ["Press area"]}, "condition": {"type": "presence"},
+      "verify": {"question": "Is this person wearing a hard hat or safety helmet on their head?", "expect": "no",
+                 "on_unsure": "dismiss"},
+      "severity": "critical", "timing": {"hold_seconds": 2, "cooldown_seconds": 120}}, ["Press line"]),
+]  # fmt: skip
 DEMO_USERS = [
     # email, name, role, sites (None = all)
     ("owner@cammind.test", "Ayesha Khan", Role.OWNER, None),
@@ -77,8 +111,41 @@ class Command(BaseCommand):
                 camera.set_urls(f"{TEST_STREAMS}/{stream}")
                 camera.save()
                 cameras.append(camera)
+            by_name = {c.name: c for c in cameras}
+            zones = {}
+            for camera_name, zone_name, kind, points, in_side in ZONES:
+                zones[zone_name], _ = Zone.objects.update_or_create(
+                    camera=by_name[camera_name],
+                    name=zone_name,
+                    defaults={"kind": kind, "points": points, "in_side": in_side},
+                )
+            by_name["Press line"].cloud_ai_allowed = True  # the helmet check sends crops
+            by_name["Press line"].save()
+            for site_name, rule_name, text, shape, camera_names in RULES:
+                shape = {**shape, "camera_ids": [by_name[n].id for n in camera_names]}
+                where = dict(shape["where"])  # type: ignore[call-overload]
+                if "zones" in where:
+                    where["zone_ids"] = [zones[z].id for z in where.pop("zones")]
+                if "line" in where:
+                    where["line_id"] = zones[where.pop("line")].id
+                spec = validate_spec({**shape, "where": where}, org)
+                rule, _ = Rule.objects.update_or_create(
+                    org=org, site=sites[site_name], name=rule_name, defaults={"status": "active"}
+                )
+                if rule.current_version is None:
+                    rule.current_version = RuleVersion.objects.create(
+                        org=org,
+                        rule=rule,
+                        version=1,
+                        source_text=text,
+                        spec=spec.model_dump(mode="json", by_alias=True),
+                        summary=summarize(spec, {z.id: z.name for z in zones.values()}),
+                    )
+                    rule.save()
 
-        self.stdout.write(f"Workspace {org.name}: {len(sites)} sites, {len(cameras)} cameras.")
+        self.stdout.write(
+            f"Workspace {org.name}: {len(sites)} sites, {len(cameras)} cameras, {len(RULES)} rules."
+        )
         for email, _, role, _ in DEMO_USERS:
             self.stdout.write(f"  {role:<9} {email}")
         if no_video:

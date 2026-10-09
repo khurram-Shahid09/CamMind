@@ -155,3 +155,26 @@ class RuleValidateView(OrgScopedViewMixin, APIView):
         return Response(
             {"ok": True, "errors": [], "summary": summarize(spec, zone_names(self.org))}
         )
+
+
+class RuleCompileView(OrgScopedViewMixin, APIView):
+    """Plain English -> rule spec, question or refusal (docs/06). Nothing is saved."""
+
+    method_roles = {"POST": EDITORS}
+
+    def post(self, request: Request) -> Response:
+        from .compiler import compile_rule
+
+        data = dict(request.data)
+        text = str(data.get("text", "")).strip()[:500]
+        site = Site.objects.for_org(self.org).filter(pk=data.get("site_id")).first()
+        if not text or site is None or not self.membership.can_access_site(site.pk):
+            raise ApiError("bad_request", "Give the rule text and one of your sites.")
+        result = compile_rule(text, site)
+        record(
+            "rule.compiled",
+            org=self.org,
+            request=request,
+            metadata={"text": text, "kind": result["kind"]},
+        )
+        return Response(result)

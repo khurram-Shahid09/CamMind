@@ -112,6 +112,7 @@ def _gemini[T: BaseModel](schema: type[T], system: str, parts: Sequence[Part]) -
         response_mime_type="application/json",
         response_schema=schema,
         temperature=0,
+        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
     last_error = "every key and model is over its limit; try again later"
     for attempt in range(ROUNDS):

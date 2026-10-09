@@ -169,15 +169,18 @@ class Worker:
         source = self.sources.get(camera_id, f"{self.restream}/{camera_id}")
         reader = StreamReader(camera_id, source, fps, realtime=True)
         pipeline = CameraPipeline(_LockedDetector(self.detector, self.detector_lock), fps)  # type: ignore[arg-type]
-        version = None
+        version = ""
         engine = Engine([])
         rules: dict[str, CompiledRule] = {}
         for frame in reader:
             if self.stop.is_set():
                 reader.stop()
                 break
-            if version is not self.config:  # reloaded
-                version = self.config
+            fingerprint = json.dumps(
+                [self.config["rules"], self.config["zones"]], sort_keys=True, default=str
+            )
+            if fingerprint != version:  # rules or zones changed: rebuild the engine
+                version = fingerprint
                 rules = {r.id: r for r in compile_rules(self.config, camera_id)}
                 engine = Engine(list(rules.values()))
                 log.info("%s: %d rules", camera["name"], len(rules))

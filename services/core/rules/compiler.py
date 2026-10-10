@@ -21,7 +21,7 @@ PROMPT_VERSION = "compile_v1"
 SYSTEM = """You translate a camera monitoring request into a CamMind rule spec. You don't watch video.
 
 Return JSON with "kind" = "rule", "question" or "unsupported".
-- rule: "spec_json" holds the spec as a JSON string; "assumptions" lists how you read vague words.
+- rule: "spec_json" holds the spec as a JSON string; "assumptions" lists, in short plain words, how you read vague words. Refer to cameras and zones by their names, never by id.
 - question: one short "question" and, when it helps, "options" (ids).
 - unsupported: "reason" and a "suggestion" the user could type instead.
 

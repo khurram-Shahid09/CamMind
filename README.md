@@ -11,7 +11,27 @@ CamMind turns any RTSP IP camera into an AI watcher. You write a rule the way yo
 
 CamMind compiles the rule into a precise, checkable spec, shows you what it understood, and once you confirm, it watches the stream. When the rule is met it sends an alert with a snapshot and a short clip, by email, Telegram, Slack or webhook, and logs the event for review.
 
-> **Status:** 🏗️ Building the MVP: accounts, sites and cameras (checked, encrypted, with snapshots) work; the vision pipeline is next. See the [roadmap](docs/15-roadmap-build-plan.md).
+▶️ **[Watch the demo (85 s, voice-over)](demo/out/cammind-demo.mp4)**
+
+[![CamMind demo](demo/out/cover.png)](demo/out/cammind-demo.mp4)
+
+> **Status:** ✅ Demo-ready MVP: cameras → plain-English rules → on-site detection → AI check when needed → events with evidence → Slack alerts. What's next is in [docs/20](docs/20-demo-sprint.md#pending-next-week).
+
+## Results
+
+Measured on this laptop's CPU (no GPU) with the five looping test cameras ([SOURCES.md](infra/test-streams/SOURCES.md)):
+
+| | |
+|---|---|
+| Detector (D-FINE-S, ONNX Runtime, CPU) | **~150 ms per frame** at 1080p; RT-DETRv2-S was 240–380 ms and produced more false positives |
+| Rule compiler (Gemini) | The demo sentences compile correctly: time windows, zones, a gate line, a helmet check, and a **refusal** for "tell me when my brother Ali comes home" |
+| Helmet check on the workshop clip | Every worker wears a hard hat; the AI answered YES at 95–100% each time, so **0 false alarms** |
+| From a person stopping in a zone to an event with a snapshot | ~3 s (the rule's hold time) + well under a second to report |
+| Tests | 140+ core tests, 32 vision tests, 8 rule-spec tests |
+
+| Plain English → precise rule | AI check on a crop | Live cameras |
+|---|---|---|
+| ![Rule understood](demo/out/shots/02-rule-understood.png) | ![Helmet check](demo/out/shots/07-event-helmet.png) | ![Live](demo/out/shots/01-live.png) |
 
 ---
 

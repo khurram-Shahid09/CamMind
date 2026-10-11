@@ -16,8 +16,8 @@ Each step ends with tests passing, commits pushed, and this table updated.
 | 4 | **Alerts and clips:** segment recorder, clip cutting, Telegram (photo, then clip) and in-app SSE | Event → Telegram photo in < 3 s, clip follows | ✅ Slack instead of Telegram (webhook); clips moved to pending |
 | 5 | **Rule compiler:** prompt, structured output, validation + one repair, questions and refusals; `POST /rules/compile`, rules API with versions | The 5 rules in the demo script compile correctly (Gemini and the offline fake) | ✅ night window, gate crossing, helmet check and a refusal all compile on Gemini |
 | 6 | **Verification (helmet only):** crops, yes/no check, recheck, budgets, "unverified" fallback, injection-safe decision | Helmet clip: no-helmet person confirmed, helmeted person dismissed, paper-sign scene unchanged | ✅ on the workshop clip Gemini sees the hard hats (0.95–0.98), so no false alarms; a no-helmet clip and the paper-sign scene are pending |
-| 7 | **Dashboard:** login, live grid, camera page with zone editor, new-rule flow with the summary card, events timeline and event detail | Full flow in the browser: camera → zone → rule → event | ⬜ |
-| 8 | **Demo:** real clips in place, scripted demo data, Playwright capture, voice-over, captions, cover image, screenshots, README results table, short eval run | `demo/out/cammind-demo.mp4` and images ready for the portfolio | ⬜ |
+| 7 | **Dashboard:** login, live grid, camera page with zone editor, new-rule flow with the summary card, events timeline and event detail | Full flow in the browser: camera → zone → rule → event | ✅ login, live grid, rules with the "what CamMind understood" card, events and event detail with the AI check (zones are seeded; the zone editor is pending) |
+| 8 | **Demo:** real clips in place, scripted demo data, Playwright capture, voice-over, captions, cover image, screenshots, README results table, short eval run | `demo/out/cammind-demo.mp4` and images ready for the portfolio | ✅ 85 s video with voice-over, cover, 8 screenshots, README results |
 
 **Order of cuts if the budget runs short:** step 6 shrinks to a recorded (fake-provider) answer set; step 7 drops the zone editor (zones seeded instead); step 4 drops clips (snapshot only). Steps 1–3, 5 and 8 are the story and stay.
 
@@ -47,6 +47,8 @@ Built after the demo, in this order. Each item links to the doc that specifies i
 
 | Item | Spec |
 |---|---|
+| Zone editor in the dashboard, WebRTC live view, LinkedIn short (30 s vertical) | [13](13-dashboard.md) |
+| A no-helmet clip and the paper-sign injection scene for the helmet demo | [18](18-demo-script.md) |
 | Event clips (segment recorder + clip cutting) and Telegram | [07](07-video-pipeline.md#6--clips-seg-recorder--media), [10](10-actions-and-notifications.md) |
 | Full eval suite: ~80 compiler sentences, ≥ 25 labelled clips, verification crop sets, injection scenes, reports in CI | [16](16-testing-and-evals.md) |
 | `scene` rules (package, blocked exit, spill) and `frame_strip` rules (fall, fight, climbing) with motion triggers | [05](05-rule-spec.md), [08](08-rule-engine-and-events.md#verify-triggers) |

@@ -51,3 +51,6 @@ evals/clips/**/*.mp4
 # Demo recordings and renders (demo/scripts)
 demo/out/raw/
 demo/out/edit/
+!demo/out/
+demo/out/raw/
+demo/out/edit/

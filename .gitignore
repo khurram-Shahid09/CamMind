@@ -47,3 +47,7 @@ infra/test-streams/clips/*
 *.onnx
 services/vision/buffer/
 evals/clips/**/*.mp4
+
+# Demo recordings and renders (demo/scripts)
+demo/out/raw/
+demo/out/edit/

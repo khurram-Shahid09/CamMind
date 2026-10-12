@@ -47,6 +47,8 @@ Built after the demo, in this order. Each item links to the doc that specifies i
 
 | Item | Spec |
 |---|---|
+| Re-record the factory and retail use-case videos once the LLM quota resets (`capture_usecases.py factory retail`, `make_usecases.py factory retail`) | [demo/README.md](../demo/README.md) |
+| Email and WhatsApp alerts with a short clip | [10](10-actions-and-notifications.md) |
 | Zone editor in the dashboard, WebRTC live view, LinkedIn short (30 s vertical) | [13](13-dashboard.md) |
 | A no-helmet clip and the paper-sign injection scene for the helmet demo | [18](18-demo-script.md) |
 | Event clips (segment recorder + clip cutting) and Telegram | [07](07-video-pipeline.md#6--clips-seg-recorder--media), [10](10-actions-and-notifications.md) |

@@ -15,6 +15,15 @@ CamMind compiles the rule into a precise, checkable spec, shows you what it unde
 
 [![CamMind demo](demo/out/cover.png)](demo/out/cammind-demo.mp4)
 
+**Use-case videos** (one per scenario, with the flow explained):
+
+| Use case | Rule typed in plain English | Video |
+|---|---|---|
+| 🏠 Home | “Alert me if anyone stands at the back door” (plus a refused request) | [cammind-home.mp4](demo/out/usecases/cammind-home.mp4) |
+| 🏫 School | “Tell security if anyone enters the campus through the gate” | [cammind-school.mp4](demo/out/usecases/cammind-school.mp4) |
+| 🏭 Factory | “Flag any worker in the press area without a helmet” | coming soon |
+| 🛒 Retail | “Alert me if more than 2 people are on the shop floor” | coming soon |
+
 > **Status:** ✅ Demo-ready MVP: cameras → plain-English rules → on-site detection → AI check when needed → events with evidence → Slack alerts. What's next is in [docs/20](docs/20-demo-sprint.md#pending-next-week).
 
 ## Results
@@ -24,7 +33,7 @@ Measured on this laptop's CPU (no GPU) with the five looping test cameras ([SOUR
 | | |
 |---|---|
 | Detector (D-FINE-S, ONNX Runtime, CPU) | **~150 ms per frame** at 1080p; RT-DETRv2-S was 240–380 ms and produced more false positives |
-| Rule compiler (Gemini) | The demo sentences compile correctly: time windows, zones, a gate line, a helmet check, and a **refusal** for "tell me when my brother Ali comes home" |
+| Rule compiler (LLM) | The demo sentences compile correctly: time windows, zones, a gate line, a helmet check, and a **refusal** for "tell me when my brother Ali comes home" |
 | Helmet check on the workshop clip | Every worker wears a hard hat; the AI answered YES at 95–100% each time, so **0 false alarms** |
 | From a person stopping in a zone to an event with a snapshot | ~3 s (the rule's hold time) + well under a second to report |
 | Tests | 140+ core tests, 32 vision tests, 8 rule-spec tests |
@@ -115,7 +124,7 @@ Details: [docs/03-architecture.md](docs/03-architecture.md).
 
 ## Tech stack
 
-Python 3.13 · Django 6 + DRF · Celery · PostgreSQL 16 · Redis · go2rtc · PyAV / FFmpeg · ONNX Runtime (RT-DETR, Apache-2.0) · ByteTrack via `supervision` · Gemini Flash / Claude for compiling and verifying · Next.js 16 · Tailwind 4 · Docker Compose.
+Python 3.13 · Django 6 + DRF · Celery · PostgreSQL 16 · Redis · go2rtc · PyAV / FFmpeg · ONNX Runtime (RT-DETR, Apache-2.0) · ByteTrack via `supervision` · any LLM for compiling and verifying (pluggable provider: hosted, GPT, Claude, open-source or your own model) · Next.js 16 · Tailwind 4 · Docker Compose.
 
 Same core as WatchOnce and [InvoiceFlow](https://github.com/khurram-Shahid09/Invoice-flow) ([ADR-0004](docs/adr/0004-reuse-portfolio-stack.md)).
 

@@ -1,6 +1,6 @@
 # Demo
 
-`out/cammind-demo.mp4` (85 s) is recorded from the real system: the vision worker watches the looping test cameras, Gemini compiles the typed rules and answers the helmet check.
+`out/cammind-demo.mp4` (85 s) is recorded from the real system: the vision worker watches the looping test cameras, the LLM compiles the typed rules and answers the helmet check.
 
 ## Re-record
 
@@ -22,4 +22,4 @@ cd ../.. && uv run --no-project --with edge-tts --with imageio-ffmpeg --with num
 
 `capture.py` writes `out/raw/main.webm`, `marks.json` and the screenshots in `out/shots/`; `make_demo.py` adds the voice-over (Microsoft neural TTS via edge-tts), captions, title cards and quiet synthesized music.
 
-The free Gemini tier allows a limited number of requests per day per model. `GEMINI_MODELS` lists fallbacks (`gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite`).
+The free tier of the default LLM provider allows a limited number of requests per day per model. `GEMINI_MODELS` lists fallbacks (`gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite`).

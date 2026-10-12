@@ -2,7 +2,7 @@
 
 Produces demo/out/raw/main.webm with marks.json (seconds into the clip) and stills in
 demo/out/shots/. Everything is live: the vision worker watches the looping test cameras,
-Gemini compiles the typed rules and checks the helmet crops.
+the LLM compiles the typed rules and checks the helmet crops.
 
 Before running (see demo/README.md): docker compose with --profile test-streams, then
 API, Celery, the vision worker and the dashboard (next start on :3200), and:

@@ -17,10 +17,14 @@ KEEP = {"Entry through the gate", "No helmet in the press area"}
 class Command(BaseCommand):
     help = "Reset the demo workspace before recording the video."
 
-    def handle(self, *args, **options) -> None:
+    def add_arguments(self, parser) -> None:
+        parser.add_argument("--clean", action="store_true", help="Remove every rule (use-case videos)")
+
+    def handle(self, *args, clean: bool = False, **options) -> None:
         call_command("seed_demo", "--no-video", stdout=self.stdout)
         org = Organization.objects.get(name="CamMind Demo")
         Event.objects.for_org(org).delete()
-        removed, _ = Rule.objects.for_org(org).exclude(name__in=KEEP).delete()
+        rules = Rule.objects.for_org(org)
+        removed, _ = (rules if clean else rules.exclude(name__in=KEEP)).delete()
         Rule.objects.for_org(org).filter(name__in=KEEP).update(status="active")
         self.stdout.write(f"Demo ready: events cleared, {removed} extra rules removed.")

@@ -39,7 +39,7 @@ ZONES = [
         [[0.3, 0.6], [0.8, 0.6], [0.8, 1.0], [0.3, 1.0]],
         "right",
     ),
-    ("Main gate", "Gate line", "line", [[0.0, 0.5], [1.0, 0.5]], "right"),
+    ("Main gate", "Gate line", "line", [[0.0, 0.5], [1.0, 0.5]], "left"),  # walking up = into campus
     (
         "Press line",
         "Press area",

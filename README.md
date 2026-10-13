@@ -21,8 +21,8 @@ CamMind compiles the rule into a precise, checkable spec, shows you what it unde
 |---|---|---|
 | 🏠 Home | “Alert me if anyone stands at the back door” (plus a refused request) | [cammind-home.mp4](demo/out/usecases/cammind-home.mp4) |
 | 🏫 School | “Tell security if anyone enters the campus through the gate” | [cammind-school.mp4](demo/out/usecases/cammind-school.mp4) |
-| 🏭 Factory | “Flag any worker in the press area without a helmet” | coming soon |
-| 🛒 Retail | “Alert me if more than 2 people are on the shop floor” | coming soon |
+| 🏭 Factory | “Flag any worker in the press area without a helmet” (AI check on a crop) | [cammind-factory.mp4](demo/out/usecases/cammind-factory.mp4) |
+| 🛒 Retail | “Alert me if more than 2 people are on the shop floor of the reception camera” | [cammind-retail.mp4](demo/out/usecases/cammind-retail.mp4) |
 
 > **Status:** ✅ Demo-ready MVP: cameras → plain-English rules → on-site detection → AI check when needed → events with evidence → Slack alerts. What's next is in [docs/20](docs/20-demo-sprint.md#pending-next-week).
 

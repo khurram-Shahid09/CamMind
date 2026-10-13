@@ -47,6 +47,7 @@ ZONES = [
         [[0.15, 0.35], [0.85, 0.35], [0.95, 1.0], [0.05, 1.0]],
         "right",
     ),
+    ("Reception", "Shop floor", "polygon", [[0.0, 0.3], [1.0, 0.3], [1.0, 1.0], [0.0, 1.0]], "right"),
 ]
 # The demo script's rules (docs/18), as the compiler produces them; ids are filled in below.
 RULES = [

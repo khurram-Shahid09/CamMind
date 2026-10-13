@@ -83,10 +83,10 @@ def segments(case: str, m: dict) -> list[Segment]:
         ]
     else:  # retail
         out = [
-            card("title", "", "Retail operations", "“Alert me if more than 2 people are on the shop floor at the same time”", "CamMind use case 4 · Retail"),
+            card("title", "", "Retail operations", "“Alert me if more than 2 people are on the shop floor”", "CamMind use case 4 · Retail"),
             Segment("live", "A shop manager wants to know when the floor gets busy, so they can send another staff member to help.",
                     "Know when the shop floor gets busy", [Sub("CASE", m["live"], m["rules"])]),
-            *common(m, "alert me if more than two people are on the shop floor at the same time."),
+            *common(m, "alert me if more than two people are on the shop floor of the reception camera."),
             Segment("event", "CamMind counts the people on the shop floor in every frame. When the count goes above two and stays there, it raises one event. " + ALERTS_NOW,
                     "Step 3 · More than 2 people → one event + Slack alert", [Sub("CASE", m["events"], m["detail"])]),
             Segment("detail", "The snapshot shows the people it counted, so the manager can see the situation at a glance.",

@@ -32,10 +32,11 @@ CASES = {
         "site": "Workshop",
         "rule": "Flag any worker in the press area without a helmet",
         "events": "/events?all=1",  # the AI saw hard hats: dismissed events are shown here
+        "answered": True,  # open the event only once the AI's answer is in
     },
     "retail": {
         "site": "Workshop",
-        "rule": "Alert me if more than 2 people are on the shop floor at the same time",
+        "rule": "Alert me if more than 2 people are on the shop floor of the reception camera",
         "events": "/events",
     },
 }
@@ -110,6 +111,8 @@ def record(browser, case: str, spec: dict) -> dict[str, float]:
     page.goto(f"{BASE}{spec['events']}")
     mark("events")
     item = f"li:has-text('{spec['rule'][:40]}')"
+    if spec.get("answered"):
+        item += ":not(:has-text('AI checking'))"
     page.wait_for_selector(item, timeout=240_000)
     mark("event_arrived")
     pause(3)

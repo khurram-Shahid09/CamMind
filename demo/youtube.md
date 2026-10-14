@@ -1,5 +1,7 @@
 # YouTube uploads
 
+Published: overview https://youtu.be/T_2oNMnniSs · home https://youtu.be/sodhgWveh70 · school https://youtu.be/C3CHocaT9g0 · factory https://youtu.be/eoAP9mu7JGA · retail https://youtu.be/_7TRiZITRz0
+
 Thumbnails: `demo/out/thumbnails/` (1280×720). Suggested playlist: **CamMind: AI cameras in plain English**.
 Paste each video's link back into the README (`demo/out/...mp4` → YouTube URL) after upload.
 

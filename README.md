@@ -11,18 +11,18 @@ CamMind turns any RTSP IP camera into an AI watcher. You write a rule the way yo
 
 CamMind compiles the rule into a precise, checkable spec, shows you what it understood, and once you confirm, it watches the stream. When the rule is met it sends an alert with a snapshot and a short clip, by email, Telegram, Slack or webhook, and logs the event for review.
 
-▶️ **[Watch the demo (85 s, voice-over)](demo/out/cammind-demo.mp4)**
+▶️ **[Watch the 85-second demo](https://youtu.be/T_2oNMnniSs)** · 📄 **[Case study](https://khurramshahid.vercel.app/cammind)**
 
-[![CamMind demo](demo/out/cover.png)](demo/out/cammind-demo.mp4)
+[![CamMind demo](demo/out/cover.png)](https://youtu.be/T_2oNMnniSs)
 
 **Use-case videos** (one per scenario, with the flow explained):
 
 | Use case | Rule typed in plain English | Video |
 |---|---|---|
-| 🏠 Home | “Alert me if anyone stands at the back door” (plus a refused request) | [cammind-home.mp4](demo/out/usecases/cammind-home.mp4) |
-| 🏫 School | “Tell security if anyone enters the campus through the gate” | [cammind-school.mp4](demo/out/usecases/cammind-school.mp4) |
-| 🏭 Factory | “Flag any worker in the press area without a helmet” (AI check on a crop) | [cammind-factory.mp4](demo/out/usecases/cammind-factory.mp4) |
-| 🛒 Retail | “Alert me if more than 2 people are on the shop floor of the reception camera” | [cammind-retail.mp4](demo/out/usecases/cammind-retail.mp4) |
+| 🏠 Home | “Alert me if anyone stands at the back door” (plus a refused request) | [▶️ Watch](https://youtu.be/sodhgWveh70) |
+| 🏫 School | “Tell security if anyone enters the campus through the gate” | [▶️ Watch](https://youtu.be/C3CHocaT9g0) |
+| 🏭 Factory | “Flag any worker in the press area without a helmet” (AI check on a crop) | [▶️ Watch](https://youtu.be/eoAP9mu7JGA) |
+| 🛒 Retail | “Alert me if more than 2 people are on the shop floor of the reception camera” | [▶️ Watch](https://youtu.be/_7TRiZITRz0) |
 
 > **Status:** ✅ Demo-ready MVP: cameras → plain-English rules → on-site detection → AI check when needed → events with evidence → Slack alerts. What's next is in [docs/20](docs/20-demo-sprint.md#pending-next-week).
 
